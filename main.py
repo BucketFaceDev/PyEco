@@ -7,50 +7,18 @@ import math
 from dearpygui.core import *
 from dearpygui.simple import *
 
-# Classes
-class Global():
-    on = 1
-    counterA = 1
-    counterB = 1
-    mineAResources = 1000
-    mineBResources = 1000
-    mineAPrice = 1000
-    def setMineAPrice(valueA):
-        Global.counterA = Global.counterA + 1
-        Global.mineAPrice = valueA
-        if (math.modf(Global.counterA/ 5)[0] == 0.0):
-            Global.mineAPriceHistory.append(valueA)
-    def setMineBPrice(valueB):
-        Global.counterB = Global.counterB + 1
-        Global.mineBPrice = valueB
-        if (math.modf(Global.counterB/ 5)[0] == 0.0):
-            Global.mineBPriceHistory.append(valueB)
-
-    mineAPriceHistory = []
-    mineBPrice = 1000
-    mineBPriceHistory = []
-    proFactoryResources = 0
-    proFactoryBal = 1000
-    proResource = 0
-    proResourcePrice = 2000
-
-    carFactoryResources = 0
-    carFactoryBal = 5000
-
-    waitBetweenUpdatesInSeconds = 1
-
 class Resource:
     def __init__(self, name, price):
         self.name = name
-        self.resourcePrice = price
+        self.price = price
         self.priceHistory = []
         self.counter = 0
         self.resources = 1000
 
     def setPrice(self, price):
         self.counter = self.counter + 1
-        self.resourcePrice = price
-        if (math.modf(Global.counterA/ 5)[0] == 0.0):
+        self.price = price
+        if (math.modf(self.counter/ 5)[0] == 0.0):
             self.priceHistory.append(price)
 
     def supplyAndDemand(self):
@@ -59,15 +27,37 @@ class Resource:
         
         self.resources = self.resources + mineRate
         if (self.price > 1000):
-            self.setPrice(Global.mineAPrice - priceDeflation)
+            self.setPrice(self.price - priceDeflation)
 
         if (self.resources < 1000):
-            self.setPrice (Global.mineAPrice + random.randint(40,75))
+            self.setPrice (self.price + random.randint(40,75))
         if (self.resources > 1000):
-            self.setPrice (Global.mineAPrice + random.randint(10, 20))
+            self.setPrice (self.price + random.randint(10, 20))
+    
+    def buy(self, quantity):
+        if (self.resources < quantity):
+            return False
+        self.resources = self.resources - quantity
+        return True
+
     
 
+# Classes
+class Global():
+    on = 1
+    counterA = 1
+    counterB = 1
 
+    mineA = Resource('Mine A', 1000)
+    mineB = Resource('Mine B', 1000)
+    
+    proFactoryResources = 0
+    proFactoryBal = 1000
+    proResource = 0
+    proResourcePrice = 2000
+    carFactoryResources = 0
+    carFactoryBal = 5000
+    waitBetweenUpdatesInSeconds = 1
 # Main Program
 
 def buyRawResource():
@@ -75,23 +65,15 @@ def buyRawResource():
         log_warning(message="Processing Factory can no longer afford raw material!")
         Global.on = 0
         return
-
-if Global.mineAPrice <= Global.mineBPrice:
-    if Global.mineAResources >= 100:
-        Global.mineAResources = Global.mineAResources - 200
+    if (Global.mineA.price <= Global.mineB.price) and Global.mineA.buy(100):
         Global.proFactoryResources = Global.proFactoryResources + 100
-        Global.proFactoryBal = Global.proFactoryBal - Global.mineAPrice
-elif Global.mineBPrice <= Global.mineAPrice:
-        if Global.mineBResources >= 100:
-            Global.mineBResources = Global.mineBResources - 200
-            Global.proFactoryResources = Global.proFactoryResources + 100
-            Global.proFactoryBal = Global.proFactoryBal - Global.mineBPrice
-        else:
-            if Global.mineAResources >= 100:
-                Global.mineAResources = Global.mineAResources - 100
-                Global.proFactoryResources = Global.proFactoryResources + 100
-                Global.proFactoryBal = Global.proFactoryBal - Global.mineAPrice
-            log_warning(message="Mine B has run out of resources!")
+        Global.proFactoryBal = Global.proFactoryBal - Global.mineA.price  
+    elif (Global.mineB.buy(100)):
+        Global.proFactoryResources = Global.proFactoryResources + 100
+        Global.proFactoryBal = Global.proFactoryBal - Global.mineB.price
+    else:
+        log_warning(message="Mines have has run out of resources!")
+             
 
 def carBuyRawResource():
     if Global.carFactoryBal >= Global.proResourcePrice:
@@ -100,81 +82,52 @@ def carBuyRawResource():
             Global.carFactoryResources = Global.carFactoryResources + 100
             Global.carFactoryBal = Global.carFactoryBal - Global.proResourcePrice
 
-
 def supplyAndDemand():
-
-    mineRate = random.randint(50, 70)
-    priceDeflation = random.randint(10, 40)
-
-    Global.mineAResources = Global.mineAResources + mineRate
-    Global.mineBResources = Global.mineBResources + mineRate
-
-    if Global.mineAPrice > 1000:
-        Global.setMineAPrice(Global.mineAPrice - priceDeflation)
-
-    if Global.mineBPrice > 1000:
-        Global.setMineBPrice(Global.mineBPrice - priceDeflation)
-
-    if Global.proResourcePrice > 1000:
-        Global.proResourcePrice = Global.proResourcePrice - priceDeflation
-
-    #	Mine price per 100U inflation
-
-    if (Global.mineAResources < 1000):
-        Global.setMineAPrice (Global.mineAPrice + random.randint(40,75))
-    if (Global.mineAResources > 1000):
-        Global.setMineAPrice (Global.mineAPrice + random.randint(10, 20))
-
-    if (Global.mineBResources < 1000):
-        Global.setMineBPrice (Global.mineBPrice + random.randint(40,75))
-    if (Global.mineBResources > 1000):
-        Global.setMineBPrice (Global.mineBPrice + random.randint(10,20))
-
-
+    Global.mineA.supplyAndDemand()
+    Global.mineB.supplyAndDemand()
 
 def startTheStatCalculator():
-        while (Global.on == 1):
+    while (Global.on == 1):
+        time.sleep(Global.waitBetweenUpdatesInSeconds)
 
-            time.sleep(Global.waitBetweenUpdatesInSeconds)
+        supplyAndDemand()
 
-            supplyAndDemand()
+        if Global.proFactoryResources < 100:
+            buyRawResource()
+        else:
+            Global.proFactoryResources = Global.proFactoryResources - 100
+            Global.proResource = Global.proResource + 50
+            Global.proFactoryBal = Global.proFactoryBal + 2000 # temp until more fact/shops added
 
-            if Global.proFactoryResources < 100:
-                buyRawResource()
-            else:
-                Global.proFactoryResources = Global.proFactoryResources - 100
-                Global.proResource = Global.proResource + 50
-                Global.proFactoryBal = Global.proFactoryBal + 2000 # temp until more fact/shops added
-
-            if Global.carFactoryResources < 300:
-                carBuyRawResource()
-            else:
-                Global.carFactoryResources = Global.carFactoryResources - 300
-                Global.carFactoryBal = Global.carFactoryBal + 10000
+        if Global.carFactoryResources < 300:
+            carBuyRawResource()
+        else:
+            Global.carFactoryResources = Global.carFactoryResources - 300
+            Global.carFactoryBal = Global.carFactoryBal + 10000
 
             # if (proResource > 4500):
             #     on = 0
             #     print("Resources maxed!")
 
-            print("Processing Factory Raw Material = " + str(Global.proFactoryResources))
-            print("Processing Factory Balance = £" + str(Global.proFactoryBal))
-            print("Processed Material = " + str(Global.proResource))
-            print("\n")
-            print("Mine A Raw Material =" + str(Global.mineAResources))
-            print("Mine B Raw Material =" + str(Global.mineBResources))
-            print("Mine A Unit Price = £" + str(Global.mineAPrice))
-            print("Mine B Unit Price = £" + str(Global.mineBPrice))
-            print("\n")
+        print("Processing Factory Raw Material = " + str(Global.proFactoryResources))
+        print("Processing Factory Balance = £" + str(Global.proFactoryBal))
+        print("Processed Material = " + str(Global.proResource))
+        print("\n")
+        print("Mine A Raw Material =" + str(Global.mineA.resources))
+        print("Mine B Raw Material =" + str(Global.mineB.resources))
+        print("Mine A Unit Price = £" + str(Global.mineA.price))
+        print("Mine B Unit Price = £" + str(Global.mineA.resources))
+        print("\n")
 
 t = threading.Thread(target=startTheStatCalculator, daemon=True)
 t.start()
 
 def updatestats(sender, data):
 
-    set_value("Mine A Resources", str(Global.mineAResources))
-    set_value("Mine B Resources", str(Global.mineBResources))
-    set_value("Mine A Price", "£" + str(Global.mineAPrice))
-    set_value("Mine B Price", "£" + str(Global.mineBPrice))
+    set_value("Mine A Resources", str(Global.mineA.resources))
+    set_value("Mine B Resources", str(Global.mineB.resources))
+    set_value("Mine A Price", "£" + str(Global.mineA.price))
+    set_value("Mine B Price", "£" + str(Global.mineB.price))
     set_value("Processing Factory Raw", str(Global.proFactoryResources))
     set_value("Processing Factory Bal", str(Global.proFactoryBal))
     set_value("Processed Material", str(Global.proResource))
@@ -182,10 +135,10 @@ def updatestats(sender, data):
     set_value("Car Factory Bal", str(Global.carFactoryBal))
 
     #if (math.modf(Global.counter/ 500)[0] == 0.0):
-    set_value("Mine A Price History", Global.mineAPriceHistory)
-    set_value("Mine B Price History", Global.mineBPriceHistory)
+    set_value("Mine A Price History", Global.mineA.priceHistory)
+    set_value("Mine B Price History", Global.mineB.priceHistory)
     set_value("Processed Material Price", Global.proResourcePrice)
-    Global.waitBetweenUpdatesInSeconds = get_value("Timescale")
+    # Global.waitBetweenUpdatesInSeconds = get_value("Timescale")
 
 # GUI
 
@@ -204,20 +157,20 @@ def primary():
 
                 add_text("Mine A Resources: ")
                 add_same_line()
-                add_text("Mine A Resources", default_value =str(Global.mineAResources) + "U")
+                add_text("Mine A Resources", default_value =str(Global.mineA.resources) + "U")
 
                 add_text("Mine B Resources: ")
                 add_same_line()
-                add_text("Mine B Resources", default_value=str(Global.mineBResources)+ "U")
+                add_text("Mine B Resources", default_value=str(Global.mineB.resources)+ "U")
 
                 add_text("Mine A Price: ")
                 add_same_line()
-                add_text("Mine A Price", default_value=str(Global.mineAPrice))
+                add_text("Mine A Price", default_value=str(Global.mineA.price))
 
 
                 add_text("Mine B Price: ")
                 add_same_line()
-                add_text("Mine B Price", default_value=str(Global.mineBPrice))
+                add_text("Mine B Price", default_value=str(Global.mineB.price))
                 
                 add_text("Processing Factory Raw: ")
                 add_same_line()
@@ -255,8 +208,8 @@ def primary():
 
             with tab('Yval', label='Graphs'):
                 add_text("Mine Price Statistics")
-                add_simple_plot("Mine A Price History", value=Global.mineAPriceHistory, height=300, minscale=0, maxscale=3000)
-                add_simple_plot("Mine B Price History", value=Global.mineBPriceHistory, height=300, minscale=0, maxscale=3000) 
+                add_simple_plot("Mine A Price History", value=Global.mineA.priceHistory, height=300, minscale=0, maxscale=3000)
+                add_simple_plot("Mine B Price History", value=Global.mineB.priceHistory, height=300, minscale=0, maxscale=3000) 
 
 # GUI init
 set_render_callback(updatestats)
