@@ -209,11 +209,16 @@ def primary():
             with tab('Yval', label='Graphs'):
                 add_text("Mine Price Statistics")
                 add_simple_plot("Mine A Price History", value=Global.mineA.priceHistory, height=300, minscale=0, maxscale=3000)
-                add_simple_plot("Mine B Price History", value=Global.mineB.priceHistory, height=300, minscale=0, maxscale=3000) 
+                add_simple_plot("Mine B Price History", value=Global.mineB.priceHistory, height=300, minscale=0, maxscale=3000)
+
+            
+
+
 
 # GUI init
+
+
+
 set_render_callback(updatestats)
 start_dearpygui(primary_window="Home")
 primary()
-
-
