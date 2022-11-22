@@ -4,8 +4,7 @@ import time
 import random
 import threading
 import math
-from dearpygui.core import *
-from dearpygui.simple import *
+import dearpygui.dearpygui as dpg
 
 # Variables
 class Global():
@@ -166,37 +165,37 @@ def updatestats(sender, data):
 
 def primary():
 
-    with window("Home", height=600, width=800):
+    with dpg.window("Home", height=600, width=800):
         
-        set_window_pos("Home", 0, 0)
+        dpg.set_window_pos("Home", 0, 0)
 
-        with tab_bar("TabBar"):
+        with dpg.tab_bar("TabBar"):
 
-            with tab('XVal', label='Overview'):
-                add_text("Current Statistics")
+            with dpg.tab('XVal', label='Overview'):
+                dpg.add_text("Current Statistics")
 
-                add_separator
+                dpg.add_separator
 
-                add_text("Mine A Resources: ")
-                add_same_line()
-                add_text("Mine A Resources", default_value =str(Global.mineAResources) + "U")
+                dpg.add_text("Mine A Resources: ")
+                dpg.add_same_line()
+                dpg.add_text("Mine A Resources", default_value =str(Global.mineAResources) + "U")
 
-                add_text("Mine B Resources: ")
-                add_same_line()
-                add_text("Mine B Resources", default_value=str(Global.mineBResources)+ "U")
+                dpg.add_text("Mine B Resources: ")
+                dpg.add_same_line()
+                dpg.add_text("Mine B Resources", default_value=str(Global.mineBResources)+ "U")
 
-                add_text("Mine A Price: ")
-                add_same_line()
-                add_text("Mine A Price", default_value=str(Global.mineAPrice))
+                dpg.add_text("Mine A Price: ")
+                dpg.add_same_line()
+                dpg.add_text("Mine A Price", default_value=str(Global.mineAPrice))
 
 
-                add_text("Mine B Price: ")
-                add_same_line()
-                add_text("Mine B Price", default_value=str(Global.mineBPrice))
+                dpg.add_text("Mine B Price: ")
+                dpg.add_same_line()
+                dpg.add_text("Mine B Price", default_value=str(Global.mineBPrice))
                 
-                add_text("Processing Factory Raw: ")
-                add_same_line()
-                add_text("Processing Factory Raw", default_value=str(Global.proFactoryResources))
+                dpg.add_text("Processing Factory Raw: ")
+                dpg.add_same_line()
+                dpg.add_text("Processing Factory Raw", default_value=str(Global.proFactoryResources))
 
                 add_text("Processing Factory Bal: ")
                 add_same_line()

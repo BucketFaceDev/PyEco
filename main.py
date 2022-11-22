@@ -4,8 +4,7 @@ import time
 import random
 import threading
 import math
-from dearpygui.core import *
-from dearpygui.simple import *
+import dearpygui.dearpygui as dpg
 
 # Classes
 class Global():
@@ -191,76 +190,76 @@ def updatestats(sender, data):
 
 def primary():
 
-    with window("Home", height=600, width=800):
+    with dpg.window("Home", height=600, width=800):
         
-        set_window_pos("Home", 0, 0)
+        dpg.set_window_pos("Home", 0, 0)
 
-        with tab_bar("TabBar"):
+        with dpg.tab_bar("TabBar"):
 
-            with tab('XVal', label='Overview'):
-                add_text("Current Statistics")
+            with dpg.tab('XVal', label='Overview'):
+                dpg.add_text("Current Statistics")
 
-                add_separator
+                dpg.add_separator
 
-                add_text("Mine A Resources: ")
-                add_same_line()
-                add_text("Mine A Resources", default_value =str(Global.mineAResources) + "U")
+                dpg.add_text("Mine A Resources: ")
+                dpg.add_same_line()
+                dpg.add_text("Mine A Resources", default_value =str(Global.mineAResources) + "U")
 
-                add_text("Mine B Resources: ")
-                add_same_line()
-                add_text("Mine B Resources", default_value=str(Global.mineBResources)+ "U")
+                dpg.add_text("Mine B Resources: ")
+                dpg.add_same_line()
+                dpg.add_text("Mine B Resources", default_value=str(Global.mineBResources)+ "U")
 
-                add_text("Mine A Price: ")
-                add_same_line()
-                add_text("Mine A Price", default_value=str(Global.mineAPrice))
+                dpg.add_text("Mine A Price: ")
+                dpg.add_same_line()
+                dpg.add_text("Mine A Price", default_value=str(Global.mineAPrice))
 
 
-                add_text("Mine B Price: ")
-                add_same_line()
-                add_text("Mine B Price", default_value=str(Global.mineBPrice))
+                dpg.add_text("Mine B Price: ")
+                dpg.add_same_line()
+                dpg.add_text("Mine B Price", default_value=str(Global.mineBPrice))
                 
-                add_text("Processing Factory Raw: ")
-                add_same_line()
-                add_text("Processing Factory Raw", default_value=str(Global.proFactoryResources))
+                dpg.add_text("Processing Factory Raw: ")
+                dpg.add_same_line()
+                dpg.add_text("Processing Factory Raw", default_value=str(Global.proFactoryResources))
 
-                add_text("Processing Factory Bal: ")
-                add_same_line()
-                add_text("Processing Factory Bal", default_value=str(Global.proFactoryBal))
+                dpg.add_text("Processing Factory Bal: ")
+                dpg.add_same_line()
+                dpg.add_text("Processing Factory Bal", default_value=str(Global.proFactoryBal))
 
-                add_text("Processed Material: ")
-                add_same_line()
-                add_text("Processed Material", default_value=str(Global.proResource))
+                dpg.add_text("Processed Material: ")
+                dpg.add_same_line()
+                dpg.add_text("Processed Material", default_value=str(Global.proResource))
 
-                add_text("Processed Material Price: ")
-                add_same_line()
-                add_text("Processed Material Price")
+                dpg.add_text("Processed Material Price: ")
+                dpg.add_same_line()
+                dpg.add_text("Processed Material Price")
 
-                add_text("Car Factory Resources: ")
-                add_same_line()
-                add_text("Car Factory Resources", default_value=str(Global.carFactoryResources) + "U")
+                dpg.add_text("Car Factory Resources: ")
+                dpg.add_same_line()
+                dpg.add_text("Car Factory Resources", default_value=str(Global.carFactoryResources) + "U")
 
-                add_text("Car Factory Bal: ")
-                add_same_line()
-                add_text("Car Factory Bal", default_value=str(Global.carFactoryBal))
+                dpg.add_text("Car Factory Bal: ")
+                dpg.add_same_line()
+                dpg.add_text("Car Factory Bal", default_value=str(Global.carFactoryBal))
 
                 
-                add_button("Documentation", callback=show_documentation)
+                dpg.add_button("Documentation", callback=show_documentation)
 
-                add_slider_float("Timescale", default_value=1.0, vertical=False, format="%0.1f" ,max_value=2.0, min_value=0.1)
+                dpg.add_slider_float("Timescale", default_value=1.0, vertical=False, format="%0.1f" ,max_value=2.0, min_value=0.1)
                 show_logger()
 
                 # Runs one cycle of the simulation.
                 startTheStatCalculator()
 
 
-            with tab('Yval', label='Graphs'):
-                add_text("Mine Price Statistics")
-                add_simple_plot("Mine A Price History", value=Global.mineAPriceHistory, height=300, minscale=0, maxscale=3000)
-                add_simple_plot("Mine B Price History", value=Global.mineBPriceHistory, height=300, minscale=0, maxscale=3000) 
+            with dpg.tab('Yval', label='Graphs'):
+                dpg.add_text("Mine Price Statistics")
+                dpg.add_simple_plot("Mine A Price History", value=Global.mineAPriceHistory, height=300, minscale=0, maxscale=3000)
+                dpg.add_simple_plot("Mine B Price History", value=Global.mineBPriceHistory, height=300, minscale=0, maxscale=3000) 
 
 # GUI init
-set_render_callback(updatestats)
-start_dearpygui(primary_window="Home")
+dpg.set_render_callback(updatestats)
+dpg.start_dearpygui(primary_window="Home")
 primary()
 
 
